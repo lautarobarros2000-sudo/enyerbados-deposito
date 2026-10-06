@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1f4a2c">
+<title>Pedidos Enyerbados</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f4a2c'/%3E%3Cpath d='M19.5 12.5 24 4' stroke='%23e0b23a' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M9 13h14c1.3 2 2 4.1 2 6.3A9 9 0 0 1 7 19.3c0-2.2.7-4.3 2-6.3z' fill='%23f6f1e4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f1e4;
+    --card: #fffdf8;
+    --text: #1d261f;
+    --muted: #6b7266;
+    --line: #e6dfcd;
+    --brand: #1f4a2c;
+    --brand-text: #fffdf8;
+    --accent: #e0b23a;
+    --warn-bg: #fff3d6;
+    --warn: #8a5a00;
+    --late-bg: #fde3e0;
+    --late: #a3261b;
+    --ok-bg: #e2f2e4;
+    --ok: #23683a;
+    --chip: #f0e9d8;
+    --header: #1f4a2c;
+    --header-text: #f6f1e4;
+    --shadow: 0 1px 2px rgba(31,74,44,.06), 0 2px 8px rgba(31,74,44,.05);
+    --display: "Bricolage Grotesque", Georgia, serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121612;
+      --card: #1c221d;
+      --text: #ecebe4;
+      --muted: #9ca398;
+      --line: #2c342d;
+      --brand: #7dbb8a;
+      --brand-text: #0f1a12;
+      --accent: #e8c25a;
+      --header: #17301f;
+      --header-text: #f6f1e4;
+      --warn-bg: #3a2f14;
+      --warn: #f0c260;
+      --late-bg: #3d1d1a;
+      --late: #ff8f84;
+      --ok-bg: #1c3322;
+      --ok: #8fd6a0;
+      --chip: #283029;
+      --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.4 "Figtree", system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button, input { font: inherit; color: inherit; }
+
+  /* ---------- Marca ---------- */
+  .marca-enyerbados { display: flex; align-items: center; gap: 10px; }
+  .logo { width: 36px; height: 36px; flex: none; }
+  .wordmark { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: -.02em; line-height: 1; }
+  .wordmark span { color: var(--accent); }
+
+  /* ---------- Encabezado ---------- */
+  header {
+    position: sticky; top: 0; z-index: 5;
+    background: var(--header); color: var(--header-text);
+    padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 3px solid var(--accent);
+  }
+  header .titulo { flex: 1; min-width: 0; }
+  header h1 { margin: 0; }
+  header .sub { font-size: 13px; opacity: .85; margin-top: 4px; }
+  .btn-icono {
+    border: 0; background: rgba(255,255,255,.16); color: inherit;
+    width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .btn-icono svg { width: 20px; height: 20px; }
+  .girando svg { animation: girar 0.8s linear infinite; }
+  @keyframes girar { to { transform: rotate(360deg); } }
+
+  main { max-width: 640px; margin: 0 auto; padding: 12px 16px 40px; }
+
+  .seccion { margin: 18px 4px 8px; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
+
+  /* ---------- Tarjeta de pedido ---------- */
+  .pedido {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden;
+  }
+  .pedido.armado { background: var(--ok-bg); border-color: transparent; }
+  .cabecera {
+    width: 100%; border: 0; background: none; text-align: left; cursor: pointer;
+    padding: 14px 14px 12px; display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: start;
+  }
+  .comprador { font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: -.01em; overflow-wrap: anywhere; }
+  .resumen { grid-column: 1 / 2; color: var(--muted); font-size: 14px; }
+  .flecha { grid-row: 1 / 3; grid-column: 2; align-self: center; width: 22px; height: 22px; color: var(--muted); transition: transform .15s; }
+  .abierto .flecha { transform: rotate(180deg); }
+  .chips { grid-column: 1 / 2; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .chip { font-size: 12.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap; }
+  .chip.hoy { background: var(--warn-bg); color: var(--warn); }
+  .chip.atrasado { background: var(--late-bg); color: var(--late); }
+  .chip.ok { background: var(--card); color: var(--ok); }
+
+  .detalle { display: none; padding: 0 14px 14px; }
+  .abierto .detalle { display: block; }
+  .detalle h3 { margin: 4px 0 8px; font-size: 13px; color: var(--muted); font-weight: 600; }
+  .yerbas { list-style: none; margin: 0 0 12px; padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card); }
+  .yerbas li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-top: 1px solid var(--line); }
+  .yerbas li:first-child { border-top: 0; }
+  .cant { min-width: 44px; height: 36px; border-radius: 8px; background: var(--brand); color: var(--brand-text); font-weight: 800; font-size: 18px; display: grid; place-items: center; }
+  .nombre-yerba { font-weight: 600; }
+  .aviso { font-size: 13px; color: var(--warn); background: var(--warn-bg); border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; }
+  .publicaciones { font-size: 12.5px; color: var(--muted); margin: 0 0 14px; padding-left: 18px; }
+  .venta { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+  .venta b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .acciones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn {
+    border: 0; border-radius: 10px; min-height: 48px; padding: 10px 12px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .btn-principal { background: var(--brand); color: var(--brand-text); }
+  .btn-sec { background: var(--chip); color: var(--text); }
+  .armado .btn-sec { background: var(--card); color: var(--ok); }
+  .btn:disabled { opacity: .6; cursor: default; }
+
+  .vacio { text-align: center; color: var(--muted); padding: 48px 16px; }
+  .vacio .grande { font-size: 40px; }
+
+  /* ---------- Login ---------- */
+  .login { max-width: 360px; margin: 12vh auto 0; padding: 0 16px; }
+  .login .marca-enyerbados { margin-bottom: 28px; color: var(--brand); }
+  .login .logo { width: 48px; height: 48px; }
+  .login .wordmark { font-size: 30px; color: var(--text); }
+  .login h1 { font-family: var(--display); font-size: 22px; margin: 0 0 4px; }
+  .login p { color: var(--muted); margin: 0 0 20px; }
+  .login input {
+    width: 100%; height: 50px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text);
+    padding: 0 14px; font-size: 17px; margin-bottom: 10px;
+  }
+  .login .btn { width: 100%; }
+  .error { color: var(--late); font-size: 14px; min-height: 20px; margin-bottom: 8px; }
+
+  /* ---------- Aviso flotante ---------- */
+  .toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+    background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px;
+    max-width: calc(100% - 32px); opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .toast.visible { opacity: 1; }
+  .demo-banda { background: var(--warn-bg); color: var(--warn); font-size: 13px; text-align: center; padding: 6px 16px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Función de Supabase que entrega los datos (supabase/functions/deposito). No es secreta: sin contraseña no devuelve nada.
+const API = "https://xyhvqwuvpzcyldfzrbvo.supabase.co/functions/v1/deposito";
+const ZONA = "America/Argentina/Buenos_Aires";
+const params = new URLSearchParams(location.search);
+const DEMO = params.has("demo");
+
+const LOGO = `<svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+  <rect width="32" height="32" rx="9" fill="var(--accent)"/>
+  <path d="M19.5 12.5 24 4" stroke="#1f4a2c" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M9 13h14c1.3 2 2 4.1 2 6.3A9 9 0 0 1 7 19.3c0-2.2.7-4.3 2-6.3z" fill="#1f4a2c"/>
+  <path d="M10.5 15.2c3.5 1.2 7.5 1.2 11 0" stroke="#e0b23a" stroke-width="1.4" stroke-linecap="round" fill="none" opacity=".7"/>
+</svg>`;
+const MARCA = `<div class="marca-enyerbados">${LOGO}<span class="wordmark">enyerbados<span>.</span></span></div>`;
+
+const ICONOS = {
+  refrescar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>',
+  flecha: '<svg class="flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+};
+
+// ---------- Datos de prueba: pedidos para despachar el lunes 05/10 ----------
+const DEMO_AHORA = new Date("2026-10-05T09:05:00-03:00");
+const DEMO_PEDIDOS = [
+  { envio_id: 45120001, venta_id: "2000009871234411", comprador: "GOMEZ.MARIELA", limite: "2026-10-05T23:59:00-03:00", armado: null,
+    items: [{ titulo: "Yerba Mate Canarias Té Rojo Y Centella 1kg Pack X2 Unidades", cantidad: 1, yerbas: ["Té Rojo", "Té Rojo"] }] },
+  { envio_id: 45120002, venta_id: "2000009871399020", comprador: "FEDE_PAZ88", limite: "2026-10-05T23:59:00-03:00", armado: null,
+    items: [{ titulo: "Yerba Mate Uruguaya Armiño Suave 1kg", cantidad: 2, yerbas: ["Armiño Suave"] }] },
+  { envio_id: 45120003, venta_id: "2000009871502277", comprador: "LUCIAROMERO", limite: "2026-10-05T23:59:00-03:00", armado: null,
+    items: [{ titulo: "Yerba Mate Armiño Clásica 1kg", cantidad: 1, yerbas: ["Armiño Clásica"] }] },
+  { envio_id: 45120004, venta_id: "2000009872118803", comprador: "JPEREYRA", limite: "2026-10-05T23:59:00-03:00", armado: null,
+    items: [{ titulo: "Yerba Mate Uruguaya Armiño Suave 1kg", cantidad: 1, yerbas: ["Armiño Suave"] }] },
+  { envio_id: 45120005, venta_id: "2000009872230561", comprador: "CARO.BENITEZ", limite: "2026-10-05T23:59:00-03:00", armado: null,
+    items: [{ titulo: "Yerba Mate Canarias Degustación X3 Especial Serena Suave 1kg", cantidad: 2, yerbas: ["Canarias Edición Especial", "Canarias Serena", "Canarias Suave"] }] },
+  { envio_id: 45120006, venta_id: "2000009872451190", comprador: "MATEADICTO", limite: "2026-10-05T23:59:00-03:00", armado: null,
+    items: [
+      { titulo: "Yerba Mate Uruguaya Armiño Suave 1kg", cantidad: 1, yerbas: ["Armiño Suave"] },
+      { titulo: "Yerba Mate Armiño Compuesta 1kg", cantidad: 1, yerbas: ["Armiño Compuesta"] },
+    ] },
+  { envio_id: 45120007, venta_id: "2000009873007745", comprador: "SOFI.ALVAREZ", limite: "2026-10-06T23:59:00-03:00", armado: null,
+    items: [{ titulo: "Yerba Mate Armiño Clásica 1kg", cantidad: 2, yerbas: ["Armiño Clásica"] }] },
+  { envio_id: 45120008, venta_id: "2000009869990012", comprador: "RODRIGO_LM", limite: "2026-10-03T13:00:00-03:00", armado: null,
+    items: [{ titulo: "Yerba Mate Pack Baldo + Canarias Tradicional 1kg", cantidad: 1, yerbas: ["Baldo", "Canarias Tradicional"] }] },
+];
+
+// ---------- Acceso a datos ----------
+const datos = {
+  async pedidos() {
+    if (DEMO) {
+      let armados = {};
+      try { armados = JSON.parse(localStorage.getItem("demo_armados") || "{}"); } catch {}
+      return { ahora: DEMO_AHORA.toISOString(), pedidos: DEMO_PEDIDOS.map((p) => ({ ...p, armado: armados[p.envio_id] || null })) };
+    }
+    return llamar("GET", "/pedidos");
+  },
+  async marcarArmado(envioId, armado) {
+    if (DEMO) {
+      let armados = {};
+      try { armados = JSON.parse(localStorage.getItem("demo_armados") || "{}"); } catch {}
+      if (armado) armados[envioId] = new Date().toISOString(); else delete armados[envioId];
+      try { localStorage.setItem("demo_armados", JSON.stringify(armados)); } catch {}
+      return { armado: armados[envioId] || null };
+    }
+    return llamar("POST", `/pedidos/${envioId}/armado`, { armado });
+  },
+  async etiqueta(envioId, nombre) {
+    if (DEMO) { aviso("En la versión real acá se descarga la etiqueta en PDF."); return; }
+    const r = await fetch(`${API}/pedidos/${envioId}/etiqueta`, { headers: { "x-sesion": sesion.leer() } });
+    if (r.status === 401) { salir(); return; }
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || "No se pudo bajar la etiqueta");
+    const cd = r.headers.get("content-disposition") || "";
+    const delServidor = cd.match(/filename\*=UTF-8''([^;]+)/);
+    const url = URL.createObjectURL(await r.blob());
+    const a = Object.assign(document.createElement("a"), { href: url, download: delServidor ? decodeURIComponent(delServidor[1]) : nombre });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  },
+  async entrar(clave) {
+    if (DEMO) return true;
+    const r = await fetch(`${API}/entrar`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ clave }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 429) throw new Error(j.error || "Demasiados intentos. Esperá unos minutos.");
+    if (!r.ok) return false;
+    sesion.guardar(j.sesion);
+    return true;
+  },
+};
+
+// La sesión queda guardada en el celular (90 días). Si el navegador no deja guardar, dura hasta cerrar la pestaña.
+const sesion = {
+  memoria: null,
+  leer() { try { return localStorage.getItem("sesion") || this.memoria; } catch { return this.memoria; } },
+  guardar(t) { this.memoria = t; try { localStorage.setItem("sesion", t); } catch {} },
+  borrar() { this.memoria = null; try { localStorage.removeItem("sesion"); } catch {} },
+};
+
+async function llamar(metodo, ruta, cuerpo) {
+  const headers = { "x-sesion": sesion.leer() || "" };
+  if (cuerpo) headers["Content-Type"] = "application/json";
+  const r = await fetch(API + ruta, { method: metodo, headers, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
+  if (r.status === 401) { salir(); throw new Error("sesión vencida"); }
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `Error ${r.status}`);
+  return r.json();
+}
+
+// ---------- Utilidades ----------
+const app = document.getElementById("app");
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const dia = (d) => new Intl.DateTimeFormat("es-AR", { timeZone: ZONA, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+const hora = (d) => new Intl.DateTimeFormat("es-AR", { timeZone: ZONA, hour: "2-digit", minute: "2-digit", hour12: false }).format(d);
+const diaSemana = (d) => new Intl.DateTimeFormat("es-AR", { timeZone: ZONA, weekday: "short", day: "2-digit", month: "2-digit" }).format(d);
+
+// Nombres de la pestaña Costos que conviene mostrar más completos.
+const NOMBRE_VISIBLE = { "Té Rojo": "Canarias Té Rojo y Centella" };
+const nombreYerba = (yerba) => NOMBRE_VISIBLE[yerba] || yerba;
+
+/** Junta los paquetes de 1 kg de todo el pedido: [{yerba, cantidad}], de mayor a menor. */
+function paquetes(pedido) {
+  const cuenta = new Map();
+  let sinDesglose = false;
+  for (const it of pedido.items) {
+    if (!it.yerbas?.length) { sinDesglose = true; continue; }
+    for (const y of it.yerbas) cuenta.set(y, (cuenta.get(y) || 0) + it.cantidad);
+  }
+  const lista = [...cuenta].map(([yerba, cantidad]) => ({ yerba, cantidad }))
+    .sort((a, b) => b.cantidad - a.cantidad || a.yerba.localeCompare(b.yerba));
+  return { lista, sinDesglose, total: lista.reduce((a, x) => a + x.cantidad, 0) };
+}
+
+const msLimite = (p) => (p.limite ? new Date(p.limite).getTime() : Infinity);
+
+function urgencia(limite, ahora) {
+  if (!limite) return { clase: "", texto: "Fecha límite a confirmar" };
+  const d = new Date(limite);
+  if (d < ahora) return { clase: "atrasado", texto: `Atrasado · era ${diaSemana(d)} ${hora(d)}` };
+  if (dia(d) === dia(ahora)) return { clase: "hoy", texto: `Hoy antes de ${hora(d)}` };
+  return { clase: "", texto: `Antes del ${diaSemana(d)} ${hora(d)}` };
+}
+
+let toastTimer;
+function aviso(texto) {
+  const t = document.getElementById("toast");
+  t.textContent = texto; t.classList.add("visible");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("visible"), 2600);
+}
+
+// ---------- Pantallas ----------
+const abiertos = new Set();
+let estado = null;
+
+function pantallaLogin(error = "") {
+  app.innerHTML = `
+    <form class="login" id="form-login">
+      ${MARCA}
+      <h1>Pedidos del depósito</h1>
+      <p>Escribí la contraseña para ver los pedidos.</p>
+      <input type="password" id="clave" autocomplete="current-password" placeholder="Contraseña" required autofocus>
+      <div class="error" id="error">${esc(error)}</div>
+      <button class="btn btn-principal" type="submit">Entrar</button>
+    </form>`;
+  document.getElementById("form-login").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const boton = e.target.querySelector("button");
+    boton.disabled = true;
+    try {
+      if (await datos.entrar(document.getElementById("clave").value)) return cargar();
+      pantallaLogin("Contraseña incorrecta.");
+    } catch (err) {
+      pantallaLogin(err.message);
+    }
+  });
+}
+
+function salir() {
+  const habiaEntrado = !!estado;
+  estado = null;
+  sesion.borrar();
+  pantallaLogin(habiaEntrado ? "Tu sesión venció. Volvé a entrar." : "");
+}
+
+function tarjeta(p, ahora) {
+  const { lista, sinDesglose, total } = paquetes(p);
+  const u = urgencia(p.limite, ahora);
+  const abierto = abiertos.has(p.envio_id);
+  const resumen = lista.map((x) => `${x.cantidad} ${nombreYerba(x.yerba)}`).join(" · ");
+  const nombrePdf = `${p.comprador} - ${total}kg.pdf`;
+  return `
+    <article class="pedido ${p.armado ? "armado" : ""} ${abierto ? "abierto" : ""}" data-id="${p.envio_id}">
+      <button class="cabecera" data-accion="abrir" aria-expanded="${abierto}">
+        <span class="comprador">${esc(p.comprador)}</span>
+        ${ICONOS.flecha}
+        <span class="resumen">${esc(resumen || "Ver detalle")}</span>
+        <span class="chips">
+          ${p.armado ? `<span class="chip ok">✓ Armado</span>` : `<span class="chip ${u.clase}">${esc(u.texto)}</span>`}
+          <span class="chip">${total} ${total === 1 ? "paquete" : "paquetes"}</span>
+        </span>
+      </button>
+      <div class="detalle">
+        <h3>Poné en la caja (paquetes de 1 kg)</h3>
+        <ul class="yerbas">
+          ${lista.map((x) => `<li><span class="cant">${x.cantidad}</span><span class="nombre-yerba">${esc(nombreYerba(x.yerba))}</span></li>`).join("")}
+        </ul>
+        ${sinDesglose ? `<div class="aviso">Hay una publicación sin detalle de yerbas: revisá el título de abajo.</div>` : ""}
+        <ul class="publicaciones">
+          ${p.items.map((it) => `<li>${esc(it.titulo)} × ${it.cantidad}</li>`).join("")}
+        </ul>
+        <div class="venta">Venta <b>#${esc(String(p.venta_id).slice(-6))}</b> · Envío <b>${esc(p.envio_id)}</b> · fijate que coincida con la etiqueta</div>
+        <div class="acciones">
+          ${p.etiqueta_lista === false
+            ? `<button class="btn btn-principal" disabled>Etiqueta aún no lista</button>`
+            : `<button class="btn btn-principal" data-accion="etiqueta" data-nombre="${esc(nombrePdf)}">${ICONOS.pdf}Etiqueta</button>`}
+          <button class="btn btn-sec" data-accion="armado">${p.armado ? "Desmarcar" : `${ICONOS.check}Ya lo armé`}</button>
+        </div>
+      </div>
+    </article>`;
+}
+
+function render() {
+  const ahora = new Date(estado.ahora);
+  const porLimite = (a, b) => (msLimite(a) - msLimite(b)) || 0;
+  const pendientes = estado.pedidos.filter((p) => !p.armado).sort(porLimite);
+  const armados = estado.pedidos.filter((p) => p.armado).sort(porLimite);
+
+  app.innerHTML = `
+    ${DEMO ? `<div class="demo-banda">Modo prueba · datos inventados del lunes 05/10</div>` : ""}
+    <header>
+      <div class="titulo">
+        <h1>${MARCA}</h1>
+        <div class="sub">Pedidos por despachar · ${pendientes.length} para armar · ${hora(new Date())}</div>
+      </div>
+      <button class="btn-icono" id="refrescar" aria-label="Actualizar">${ICONOS.refrescar}</button>
+    </header>
+    <main>
+      ${!estado.pedidos.length ? `<div class="vacio"><div class="grande">🧉</div>No hay pedidos pendientes.</div>` : ""}
+      ${pendientes.length ? `<div class="seccion"><span>Para armar</span><span>${pendientes.length}</span></div>${pendientes.map((p) => tarjeta(p, ahora)).join("")}` : ""}
+      ${armados.length ? `<div class="seccion"><span>Armados · esperando al correo</span><span>${armados.length}</span></div>${armados.map((p) => tarjeta(p, ahora)).join("")}` : ""}
+    </main>`;
+  document.getElementById("refrescar").addEventListener("click", cargar);
+}
+
+app.addEventListener("click", async (e) => {
+  const boton = e.target.closest("[data-accion]");
+  if (!boton) return;
+  const id = Number(boton.closest(".pedido").dataset.id);
+  const pedido = estado.pedidos.find((p) => p.envio_id === id);
+  const accion = boton.dataset.accion;
+
+  if (accion === "abrir") {
+    abiertos.has(id) ? abiertos.delete(id) : abiertos.add(id);
+    return render();
+  }
+  boton.disabled = true;
+  try {
+    if (accion === "etiqueta") {
+      await datos.etiqueta(id, boton.dataset.nombre);
+    } else if (accion === "armado") {
+      const r = await datos.marcarArmado(id, !pedido.armado);
+      pedido.armado = r.armado;
+      if (pedido.armado) abiertos.delete(id);
+      render();
+      aviso(pedido.armado ? `${pedido.comprador}: marcado como armado` : `${pedido.comprador}: vuelve a pendientes`);
+    }
+  } catch (err) {
+    aviso(err.message);
+  } finally {
+    boton.disabled = false;
+  }
+});
+
+async function cargar() {
+  const boton = document.getElementById("refrescar");
+  boton?.classList.add("girando");
+  try {
+    estado = await datos.pedidos();
+    render();
+  } catch (err) {
+    if (estado) aviso("No se pudo actualizar. Revisá la conexión.");
+    else if (err.message !== "sesión vencida") app.innerHTML = `<div class="vacio">No se pudieron cargar los pedidos.<br>${esc(err.message)}</div>`;
+  } finally {
+    boton?.classList.remove("girando");
+  }
+}
+
+// Se actualiza sola cada 2 minutos y al volver a la pestaña.
+setInterval(() => { if (estado && document.visibilityState === "visible") cargar(); }, 120000);
+document.addEventListener("visibilitychange", () => { if (estado && document.visibilityState === "visible") cargar(); });
+
+if (params.get("pantalla") === "login" || (!DEMO && !sesion.leer())) pantallaLogin();
+else cargar();
+</script>
+</body>
+</html>
